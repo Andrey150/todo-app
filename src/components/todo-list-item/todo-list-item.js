@@ -29,12 +29,14 @@ export default class TodoListItem extends Component{
   }
 
   render() {
-    const { label,
+    const {
+      label,
       onDelete,
       onToggleImportant,
       onToggleDone,
       important,
-      done } = this.props
+      done
+    } = this.props
 
     let className = 'todo-list-item';
     if ( done ) {

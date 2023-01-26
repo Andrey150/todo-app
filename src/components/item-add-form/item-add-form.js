@@ -21,8 +21,11 @@ export default class ItemAddForm extends Component {
   onSubmit = (e) => {
     // Отменить стандартное поведение для onSubmit
     e.preventDefault()
-    // Меняю состояние label
-    this.props.onItemAdded(this.state.label)
+    // Проверить label на наличие букв или цифр
+    if  (this.state.label.match(/[A-Za-zА-Яа-яЁё0-9]/)) {
+      // Меняю состояние label
+      this.props.onItemAdded(this.state.label)
+    }
     this.setState({
       label: ''
     })

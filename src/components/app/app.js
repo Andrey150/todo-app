@@ -18,6 +18,8 @@ export default class App extends Component{
     ],
     important: false,
     done : false,
+    term: '',
+    filter: 'all' //active / all / done
   }
 
   createTodoItem(label) {
@@ -124,32 +126,92 @@ export default class App extends Component{
       // return {
       //   todoData: this.toggleProps(todoData, id, 'done')
       // }
-
-
     })
   }
 
-  render () {
+  /**
+   *
+   * @param term - значение из input, котореое буду искать
+   */
 
-    const { todoData } = this.state
+  onSerachChange = (term) => {
+    this.setState({ term })
+  }
+
+  /**
+   *
+   * @param filter - значение кнопки
+   */
+  onFilterChange = (filter) => {
+    this.setState({ filter })
+  }
+
+  /**
+   *
+   * @param items - массив элементов
+   * @param filter - может быть all, active, done
+   */
+  filterItems(items, filter) {
+    switch(filter) {
+      case 'all':
+        return items
+      case 'active':
+        return items.filter((el) => !el.done)
+      case 'done':
+        return items.filter((el) => el.done)
+      default:
+        return items
+    }
+  }
+
+  /**
+   *
+   * @param items - массив элементов
+   * @param term - текст, который будет искаться в массивве
+   * @returns {*} - весь массив или элементы, которые содержат искомое значение
+   */
+  search = (items, term) => {
+    if (term.length === 0) {
+      return items
+    }
+    return items.filter((el) => {
+      // Вернет элементы, которые содержат искомое значение
+      // Привожу строку поиска и данные в массиве в нижний регистр
+      return el.label
+        .toLowerCase()
+        .indexOf(term.toLowerCase()) > -1
+    })
+  }
+
+
+  render () {
+    const { todoData, term, filter } = this.state
     /**
      * Cчитаю количество элементов со значением 'done'
      */
     const doneCount = todoData.filter((el) => el.done).length;
     const todoCount = todoData.length - doneCount;
 
+    /**
+     * Фильтрация элементов по названию и свойству filter
+     */
+    const visibleElements = this.filterItems(
+      this.search(todoData, term), filter)
+
     return (
       <div className="todo-app">
         <AppHeader toDo={todoCount} done={doneCount} />
         <div className="top-panel d-flex">
-          <SearchPanel />
-          <ItemStatusFilter />
+          <SearchPanel
+            onSerachChange={this.onSerachChange}
+          />
+          <ItemStatusFilter
+            filter={filter}
+            onFilterChange={this.onFilterChange}
+          />
         </div>
         <TodoList
-          todos={todoData}
-          onDelete={this.onDeleteItem}
-          onToggleImportant={this.onToggleImportant}
-          onToggleDone={this.onToggleDone}
+          todos={visibleElements}
         />
         <ItemAddForm onItemAdded={this.addItem}/>
       </div>
